@@ -32,11 +32,11 @@ cpu_load = []
 
 
 def bytes_to_human(num, suffix='B'):
-    for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
+    for unit in ['','K','M','G']:
         if abs(num) < 1024.0:
-            return "%3.2f %s%s" % (num, unit, suffix)
+            return "%3.1f %s%s" % (num, unit, suffix)
         num /= 1024.0
-    return "%.2f %s%s" % (num, 'Yi', suffix)
+    return "%.2f %s%s" % (num, 'Y', suffix)
 
 class ISMError(Exception):
     """General exception."""
@@ -459,7 +459,7 @@ class NetSensor(BaseSensor):
     def _fetch_net(self):
         """It returns the bytes sent and received in bytes/second"""
         current = [0, 0]
-        for _, iostat in list(ps.net_io_counters(pernic=True).items()):
+        for netname, iostat in list(ps.net_io_counters(pernic=True).items()):
             current[0] += iostat.bytes_recv
             current[1] += iostat.bytes_sent
         dummy = copy.deepcopy(current)
@@ -470,7 +470,7 @@ class NetSensor(BaseSensor):
         mgr = SensorManager()
         current[0] /= mgr.get_interval()
         current[1] /= mgr.get_interval()
-        return '↓ {:>9s}/s ↑ {:>9s}/s'.format(bytes_to_human(current[0]), bytes_to_human(current[1]))
+        return '↓ {:>s}/s | ↑ {:>s}/s'.format(bytes_to_human(current[0]), bytes_to_human(current[1]))
 
 
 class BatSensor(BaseSensor):
